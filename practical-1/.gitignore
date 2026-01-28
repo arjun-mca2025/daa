@@ -1,0 +1,15 @@
+# Ignore the VSCode workspace settings
+.vscode
+
+# Ignore the Python environment
+.venv
+
+# Ignore the input
+/input
+
+# Ignore the output
+/output
+/snapshot
+
+# Ignore build files
+/build
