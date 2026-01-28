@@ -29,6 +29,13 @@ void insertionSort(std::vector<const Record *> &input, Comparator comp)
     _insertionSort(input, comp, comparisons, assignments);
 }
 
+/**
+ * @brief Sort using insertion sort and return metadata
+ *
+ * @param input The vector of Record pointers to be sorted
+ * @param comp Comparator function
+ * @return Metadata Comparisons and assignments performed
+ */
 Metadata insertionSortWithMetadata(std::vector<const Record *> &input, Comparator comp)
 {
     int comparisons = 0;

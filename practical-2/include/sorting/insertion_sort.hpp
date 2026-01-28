@@ -6,12 +6,7 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
-
-struct Metadata
-{
-    int comparisons;
-    int assignments;
-};
+#include <structs/Metadata.hpp>
 
 using Comparator = bool (*)(const Record *, const Record *);
 

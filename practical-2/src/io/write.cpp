@@ -9,6 +9,7 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
+#include <structs/Metadata.hpp>
 
 /* -------------------------------------------------------------------------- */
 /*                            Forward declarations                            */
@@ -45,6 +46,24 @@ void write(const std::vector<const Record *> &records, const std::string &relati
     {
         file << _recordToLine(r) << "\n";
     }
+}
+
+/**
+ * @brief Write metadata to a file in append mode
+ *
+ * @param meta The metadata struct to be written to file
+ * @param relativePath Relative path of the file
+ */
+void writeMetadata(Metadata meta, const std::string &relativePath)
+{
+    std::ofstream file(relativePath, std::ios::app);
+    if (!file.is_open())
+    {
+        std::cerr << "Cannot open file for writing: " << relativePath << std::endl;
+        return;
+    }
+
+    file << meta.comparisons << "," << meta.assignments << "\n";
 }
 
 /* -------------------------------------------------------------------------- */

@@ -6,9 +6,15 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <random>
 
 // Internal dependencies
 #include <structs/Record.hpp>
+
+/* -------------------------------------------------------------------------- */
+/*                                  Constants                                 */
+/* -------------------------------------------------------------------------- */
+#define TOTAL_RECORDS 16743
 
 /* -------------------------------------------------------------------------- */
 /*                            Forward declarations                            */
@@ -54,6 +60,26 @@ std::vector<const Record *> &read(const std::string &relativePath)
 
     auto &recordsRef = *records;
     return recordsRef;
+}
+
+/**
+ * @brief Generate n random samples from the given vector of Record pointers
+ *
+ * @param records Vector of Record pointers on the heap
+ * @param n Number of samples to return
+ * @return std::vector<const Record *>& Sample of size n from the given records
+ */
+std::vector<const Record *> &sampleN(std::vector<const Record *> &records, int n)
+{
+    std::vector<const Record *> *sample = new std::vector<const Record *>();
+    for (int i = 0; i < n; i++)
+    {
+        int randomIndex = rand() % TOTAL_RECORDS;
+        sample->push_back(records[randomIndex]);
+    }
+
+    auto &sampleRef = *sample;
+    return sampleRef;
 }
 
 /* -------------------------------------------------------------------------- */

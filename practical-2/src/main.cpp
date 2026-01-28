@@ -6,6 +6,7 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
+#include <structs/Metadata.hpp>
 #include <sorting/insertion_sort.hpp>
 #include <io.hpp>
 
@@ -21,26 +22,80 @@ bool compareByTemperature(const Record *rec1, const Record *rec2);
 
 int main()
 {
+    // Data file paths
+    std::string datasetPath = "./input/data.csv"; // path relative to the CWD
 
-    /* ---------------------------- Read Input file  ---------------------------- */
+    // Metadata file paths
+    std::string metadataPath = "./output/meta.csv"; // When samples of varying size are used
+    std::string reportPath = "./output/report.csv"; // "Report" is when the whole dataset is sorted
 
-    std::string path = "./input/data.csv"; // path relative to the CWD
-    auto &records = read(path);
+    // All the dataset read into a vector
+    auto &dataset = read(datasetPath);
 
-    Metadata metadata = insertionSortWithMetadata(records, compareByTemperature);
+    std::cout << "Enter 0 for sorting the whole dataset, and anything else for sorting sample of varying sizes: " << std::endl;
+    int choice;
+    std::cin >> choice;
 
-    /* ------------------------ Write the sorted records ------------------------ */
+    /* --------------------- Flow 0: Sort the whole dataset --------------------- */
+    /**
+     * Write the output to ./output/data.csv
+     * Write the metadata to ./output/report.csv
+     */
 
-    write(records, "./output/data.csv");
+    if (choice == 0)
+    {
+        // Sort the records in memory and record the metadata
+        Metadata metadata = insertionSortWithMetadata(dataset, compareByTemperature);
 
-    /* --------------------------- Write the metadata --------------------------- */
+        // Write the sorted records
+        write(dataset, "./output/data.csv");
 
-    std::ofstream out("./output/report.txt");
+        // Write the metadata
+        writeMetadata(metadata, "./output/report.csv");
 
-    out << "Comparisons: " << metadata.comparisons << "\n";
-    out << "Assignments: " << metadata.assignments << "\n";
+        std::cout << "Wrote the sorted contents to the ./output/data.csv folder and the metadata (comparisons and assignments) to ./output/report.csv" << std::endl;
 
-    return 0;
+        return 0;
+    }
+
+    /* ------------------ Flow 1: Sort samples of varying sizes ----------------- */
+
+    if (choice != 0)
+    {
+        for (int n = 10; n <= 100; n += 10)
+        {
+            Metadata sumMetadata{0, 0};
+            for (int i = 0; i < 10; i++)
+            {
+                std::string inputPath = "./input/n" + std::to_string(n) + "/sample" + std::to_string(i) + ".csv";
+                std::string outputPath = "./output/n" + std::to_string(n) + "/sample" + std::to_string(i) + ".csv";
+
+                // Generate samples
+                auto &sampleOfSizeN = sampleN(dataset, n);
+
+                // Write samples to input files
+                write(sampleOfSizeN, inputPath);
+
+                // Sort the samples
+                auto currentMetadata = insertionSortWithMetadata(sampleOfSizeN, compareByTemperature);
+                write(sampleOfSizeN, outputPath);
+
+                sumMetadata.assignments += currentMetadata.assignments;
+                sumMetadata.comparisons += currentMetadata.comparisons;
+            }
+
+            // Compute average comparisons and assignments for this particular sample size
+            Metadata averageMetadata = sumMetadata;
+            averageMetadata.assignments = sumMetadata.assignments / 10;
+            averageMetadata.comparisons = sumMetadata.comparisons / 10;
+
+            // Write the metadata to file
+            writeMetadata(averageMetadata, metadataPath);
+        }
+
+        std::cout << "Wrote the sorted contents to the ./output folder and the metadata (comparisons and assignments) to ./output/meta.csv" << std::endl;
+        return 0;
+    }
 }
 
 /* -------------------------------------------------------------------------- */
