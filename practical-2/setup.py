@@ -9,9 +9,9 @@ output_folder = Path("output")
 build_folder = Path("build")
 
 # Delete these folder if they already exist
-shutil.rmtree(input_folder)
-shutil.rmtree(output_folder)
-shutil.rmtree(build_folder)
+shutil.rmtree(input_folder, ignore_errors=True)
+shutil.rmtree(output_folder, ignore_errors=True)
+shutil.rmtree(build_folder, ignore_errors=True)
 
 input_folder.mkdir(parents=True, exist_ok=True)
 output_folder.mkdir(parents=True, exist_ok=True)

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 file_path = "./output/meta.csv"
-title = "When sorted on average temperate"
+title = "When sorted on average temperature"
 
 # Lists to store numeric data
 col1 = []
