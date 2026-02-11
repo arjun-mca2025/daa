@@ -79,7 +79,7 @@ std::string _recordToLine(const Record *record)
            std::to_string(record->year) + "," +
            record->city + "," +
            record->code + "," +
-           record->location + "," +
+           "\"" + record->location + "\"" + "," +
            record->state + "," +
            std::to_string(record->averageTemp) + "," +
            std::to_string(record->maxTemp) + "," +
