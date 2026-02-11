@@ -14,9 +14,6 @@
 
 void _insertionSort(std::vector<const Record *> &input, Comparator comp, int &comparisons, int &assignments);
 
-bool compareByAge(const Record *rec1, const Record *rec2);
-bool compareByName(const Record *rec1, const Record *rec2);
-
 /* -------------------------------------------------------------------------- */
 /*                                  Main Body                                 */
 /* -------------------------------------------------------------------------- */
