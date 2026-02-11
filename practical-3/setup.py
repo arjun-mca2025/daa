@@ -110,8 +110,8 @@ if __name__ == "__main__":
     build_folder.mkdir(parents=True, exist_ok=True)
 
     # Make sure that input and output sample folders exist
-    input_paths = [Path(f"input/{n*10:03}") for n in range(1, 10 + 1)]
-    output_paths = [Path(f"output/{n*10:03}") for n in range(1, 10 + 1)]
+    input_paths = [Path(f"input/{n:03}") for n in range(1, 10 + 1)]
+    output_paths = [Path(f"output/{n:03}") for n in range(1, 10 + 1)]
 
     for input_path in input_paths:
         input_path.mkdir(parents=True, exist_ok=True)
