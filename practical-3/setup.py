@@ -62,6 +62,11 @@ def copy_previous_input():
     dest = Path("./input")
 
     shutil.copytree(src, dest, dirs_exist_ok=True)
+    
+    # Create empty output folders
+    output_paths = [Path(f"output/n{n*10}") for n in range(1, 10 + 1)]
+    for output_path in output_paths:
+        output_path.mkdir(parents=True, exist_ok=True)
 
 def generate():
     """Generate random data
