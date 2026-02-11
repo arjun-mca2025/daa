@@ -10,7 +10,7 @@ This file is supposed to perform the following things:
 
 import os
 import shutil
-import random
+import requests
 from pathlib import Path
 
 NAMES_FILE = "names.txt"
@@ -58,7 +58,7 @@ def copy_previous_input():
     
     recreate_dir(INPUT_DIR) # Clear the input directory
     
-    src = Path("../practical-1/input")
+    src = Path("../practical-2/input")
     dest = Path("./input")
 
     shutil.copytree(src, dest, dirs_exist_ok=True)
@@ -71,29 +71,48 @@ def generate():
     """
     
     recreate_dir(INPUT_DIR) # Clear the input directory
-    
-    names = read_names(NAMES_FILE)
 
-    if not names:
-        raise RuntimeError("names.txt is empty")
+    # ----------------------- Create the required structure ---------------------- #
 
+    # Make sure that input and output sample folders exist
+    input_paths = [Path(f"input/n{n*10}") for n in range(1, 10 + 1)]
+    output_paths = [Path(f"output/n{n*10}") for n in range(1, 10 + 1)]
 
-    for dir_index in range(1, NUM_DIRS + 1):
-        subdir = os.path.join(INPUT_DIR, f"{dir_index:03}")
-        os.makedirs(subdir)
+    for input_path in input_paths:
+        input_path.mkdir(parents=True, exist_ok=True)
 
-        for file_index in range(1, FILES_PER_DIR + 1):
-            filename = f"n{file_index * 10:03}"
-            filepath = os.path.join(subdir, filename)
+    for output_path in output_paths:
+        output_path.mkdir(parents=True, exist_ok=True)
 
-            with open(filepath, "w", encoding="utf-8") as f:
-                for _ in range(file_index * RECORDS_PER_FILE):
-                    name = random.choice(names)
-                    age = random.uniform(20.0, 90.0)
-                    f.write(f"{name},{age:.1f}\n")
+    # ------------------------- Download the dataset file ------------------------ #
+
+    url = "https://corgis-edu.github.io/corgis/datasets/csv/weather/weather.csv"
+    input_path = Path("input/data.csv")
+
+    response = requests.get(url)
+    response.raise_for_status()  # Raises error if download fails
+
+    with open(input_path, "wb") as f:
+        f.write(response.content)
+
+    print("Download complete")
+
 
 
 if __name__ == "__main__":
+    input_folder = Path("input")
+    output_folder = Path("output")
+    build_folder = Path("build")
+
+    # Delete these folder if they already exist
+    shutil.rmtree(input_folder, ignore_errors=True)
+    shutil.rmtree(output_folder, ignore_errors=True)
+    shutil.rmtree(build_folder, ignore_errors=True)
+
+    input_folder.mkdir(parents=True, exist_ok=True)
+    output_folder.mkdir(parents=True, exist_ok=True)
+    build_folder.mkdir(parents=True, exist_ok=True)
+    
     print("Enter 0 for copying previous input data from insertion sort and 1 for generate new data: ")
     choice = int(input())
     
