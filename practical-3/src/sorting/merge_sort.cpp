@@ -78,7 +78,7 @@ void _merge(std::vector<const Record *> &input,
     {
         comparisons++;
 
-        if (comp(R[j], L[i]))
+        if (comp(L[i], R[j]))
         {
             input[k] = L[i];
             i++;

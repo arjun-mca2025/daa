@@ -184,5 +184,5 @@ bool compareByAge(const Record *rec1, const Record *rec2)
 
 bool compareByName(const Record *rec1, const Record *rec2)
 {
-    return rec1->name > rec2->name;
+    return rec1->name < rec2->name;
 }
