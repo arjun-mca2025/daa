@@ -42,6 +42,9 @@ void write(const std::vector<const Record *> &records, const std::string &relati
         return;
     }
 
+    // Write the header
+    file << "Data.Precipitation,Date.Full,Date.Month,Date.Week of,Date.Year,Station.City,Station.Code,Station.Location,Station.State,Data.Temperature.Avg Temp,Data.Temperature.Max Temp,Data.Temperature.Min Temp,Data.Wind.Direction,Data.Wind.Speed" << "\n";
+
     for (const Record *r : records)
     {
         file << _recordToLine(r) << "\n";
