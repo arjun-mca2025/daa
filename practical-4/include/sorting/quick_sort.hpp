@@ -4,18 +4,15 @@
 #include <vector>
 #include <functional>
 
+// Internal dependencies
+#include <structs/Metadata.hpp>
+#include <structs/Record.hpp>
+
 // Forward declaration
 struct Record;
 
 // Comparator type
 using Comparator = std::function<bool(const Record *, const Record *)>;
-
-// Metadata struct
-struct Metadata
-{
-    int comparisons;
-    int assignments;
-};
 
 void quickSort(std::vector<const Record *> &input, Comparator comp);
 
