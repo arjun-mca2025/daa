@@ -1,62 +1,78 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-files = [
-    "./output/report.txt",
-    "./output/report_age_only.txt",
-    "./output/report_name_only.txt",
-]
+quick_path = "./output/meta.csv"
+insertion_path = "../practical-2/output/meta.csv"
 
-titles = [
-    "When sorted on age alone (Quick Sort)",
-    "When sorted on name alone (Quick Sort)",
-    "When sorted on age followed by name (Quick Sort)",
-]
+title = "When sorted on average temperature"
 
-fig_names = ["age_only_quick", "name_only_quick", "both_quick"]
+# Lists to store numeric data
+comparisons_quick = []
+assignments_quick = []
+comparisons_insertion = []
+assignments_insertion = []
 
-for i, file_path in enumerate(files):
-    # Lists to store numeric data
-    col1 = []
-    col2 = []
+# Read CSV
+with open(quick_path, "r", encoding="utf-8") as f:
+    for line in f:
+        line = line.strip()
+        if not line:
+            continue
+        a, b = line.split(",")
+        comparisons_quick.append(float(a))
+        assignments_quick.append(float(b))
 
-    # Read CSV
-    with open(file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            a, b = line.split(",")
-            col1.append(float(a))
-            col2.append(float(b))
+with open(insertion_path, "r", encoding="utf-8") as f:
+    for line in f:
+        line = line.strip()
+        if not line:
+            continue
+        a, b = line.split(",")
+        comparisons_insertion.append(float(a))
+        assignments_insertion.append(float(b))
 
-    # Convert to numpy arrays
-    y1 = np.array(col1)
-    y2 = np.array(col2)
-    x = np.arange(len(y1))
+# Convert to numpy arrays
+y1 = np.array(comparisons_quick)
+y2 = np.array(assignments_quick)
 
-    degree = 1
+y3 = np.array(comparisons_insertion)
+y4 = np.array(assignments_insertion)
 
-    # Fit polynomials
-    poly1 = np.poly1d(np.polyfit(x, y1, degree))
-    poly2 = np.poly1d(np.polyfit(x, y2, degree))
+x_quick = np.arange(len(y1))
+x_insertion = np.arange(len(y3))
 
-    # Evaluate polynomials
-    y1_fit = poly1(x)
-    y2_fit = poly2(x)
+degree_quick = 1
+degree_insertion = 2
 
-    # Plot
-    plt.scatter(x, y1, label="Comparisons", color="blue")
-    plt.plot(x, y1_fit, color="blue", linestyle="--")
+# Fit polynomials
+poly1 = np.poly1d(np.polyfit(x_quick, y1, degree_quick))
+poly2 = np.poly1d(np.polyfit(x_quick, y2, degree_quick))
+poly3 = np.poly1d(np.polyfit(x_insertion, y3, degree_insertion))
+poly4 = np.poly1d(np.polyfit(x_insertion, y4, degree_insertion))
 
-    plt.scatter(x, y2, label="Assignments", color="green")
-    plt.plot(x, y2_fit, color="green", linestyle="--")
+# Evaluate polynomials
+fit1 = poly1(x_quick)
+fit2 = poly2(x_quick)
+fit3 = poly3(x_insertion)
+fit4 = poly4(x_insertion)
 
-    plt.xlabel("n/10")
-    plt.ylabel("Absolute number")
-    plt.title(titles[i])
-    plt.legend()
-    plt.grid()
-    plt.tight_layout()
-    plt.savefig(f"./plots/{fig_names[i]}.png")
-    plt.clf()
+# Plot
+plt.scatter(x_quick, y1, label="Comparisons (Quick Sort)", color="blue")
+plt.plot(x_quick, fit1, color="blue", linestyle="--")
+
+plt.scatter(x_quick, y2, label="Assignments (Quick Sort)", color="red")
+plt.plot(x_quick, fit2, color="red", linestyle="--")
+
+plt.scatter(x_insertion, y3, label="Comparisons (Insertion Sort)", color="black")
+plt.plot(x_insertion, fit3, color="black", linestyle="--")
+
+plt.scatter(x_insertion, y4, label="Assignments (Insertion Sort)", color="green")
+plt.plot(x_insertion, fit4, color="green", linestyle="--")
+
+
+plt.xlabel("n/10")
+plt.ylabel("Absolute number")
+plt.title(title)
+plt.legend()
+plt.tight_layout()
+plt.savefig("plots/insertion_quick_comparison_on_weather_data.png")
