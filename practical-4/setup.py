@@ -55,7 +55,7 @@ def recreate_dir(path):
 
 
 def copy_previous_input():
-    """Copy the Insertion sort input data"""
+    """Copy the insertion sort input data"""
 
     recreate_dir(INPUT_DIR)  # Clear the input directory
 
