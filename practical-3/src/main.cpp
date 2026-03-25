@@ -6,6 +6,7 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
+#include <structs/Metadata.hpp>
 #include <sorting/merge_sort.hpp>
 #include <io.hpp>
 
@@ -13,8 +14,7 @@
 /*                            Forward declarations                            */
 /* -------------------------------------------------------------------------- */
 
-bool compareByAge(const Record *rec1, const Record *rec2);
-bool compareByName(const Record *rec1, const Record *rec2);
+bool compareByTemperature(const Record *rec1, const Record *rec2);
 
 /* -------------------------------------------------------------------------- */
 /*                                  Main Body                                 */
@@ -22,167 +22,88 @@ bool compareByName(const Record *rec1, const Record *rec2);
 
 int main()
 {
-    std::cout << "Enter 1 to run the program on example data or anything else to run it on the generated input: " << std::endl;
+    // Data file paths
+    std::string datasetPath = "./input/data.csv"; // path relative to the CWD
+
+    // Metadata file paths
+    std::string metadataPath = "./output/meta.csv"; // When samples of varying size are used
+    std::string reportPath = "./output/report.csv"; // "Report" is when the whole dataset is sorted
+
+    // All the dataset read into a vector
+    auto &dataset = read(datasetPath);
+
+    std::cout << "Enter 0 for sorting the whole dataset, and anything else for sorting sample of varying sizes: " << std::endl;
     int choice;
     std::cin >> choice;
 
-    /* -------------------------------------------------------------------------- */
-    /*                           Flow 1: On example data                          */
-    /* -------------------------------------------------------------------------- */
+    /* --------------------- Flow 0: Sort the whole dataset --------------------- */
+    /**
+     * Write the output to ./output/data.csv
+     * Write the metadata to ./output/report.csv
+     */
 
-    if (choice == 1)
+    if (choice == 0)
     {
-        std::vector<const Record *> *records = new std::vector<const Record *>();
-        records->push_back(new Record{"Reeta", 18.5});
-        records->push_back(new Record{"Geet", 18.3});
-        records->push_back(new Record{"Reeta", 17.8});
+        // Sort the records in memory and record the metadata
+        Metadata metadata = mergeSortWithMetadata(dataset, compareByTemperature);
 
-        auto &recordsRef = *records;
+        // Write the sorted records
+        write(dataset, "./output/data.csv");
 
-        // Copy of the same records
-        auto recordsCopy = *records;
+        // Write the metadata
+        writeMetadata(metadata, "./output/report.csv");
 
-        mergeSort(recordsRef, compareByAge);
-        std::cout << "-----------------------------" << "\n";
-        for (const Record *rec : recordsRef)
-        {
-            std::cout << "After sorting on age: " << "\n";
-            std::cout << convertRecordToString(*rec) << "\n";
-        }
+        std::cout << "Wrote the sorted contents to the ./output/data.csv folder and the metadata (comparisons and assignments) to ./output/report.csv" << std::endl;
 
-        mergeSort(recordsCopy, compareByName);
-        std::cout << "-----------------------------" << "\n";
-        for (const Record *rec : recordsCopy)
-        {
-            std::cout << "After sorting on only name: " << "\n";
-            std::cout << convertRecordToString(*rec) << "\n";
-        }
-
-        std::cout << "-----------------------------" << "\n";
-        mergeSort(recordsRef, compareByName);
-        for (const Record *rec : recordsRef)
-        {
-            std::cout << "After sorting on both the fields: " << "\n";
-            std::cout << convertRecordToString(*rec) << "\n";
-        }
-
-        return 1;
+        return 0;
     }
 
-    std::vector<Metadata> report{}; // 10-sized vector for keeping average Metadata for each size of n
-    std::vector<Metadata> reportAgeOnly{};
-    std::vector<Metadata> reportNameOnly{};
+    /* ------------------ Flow 1: Sort samples of varying sizes ----------------- */
 
-    /* -------------------------------------------------------------------------- */
-    /*                          Flow 2: On the input data                         */
-    /* -------------------------------------------------------------------------- */
-
-    /*
-        Data generation is done by setup.py (either copies from the practical-1 directory or generates new random data, depending upon user choice)
-    */
-
-    /* ---------------------------- Read Input files ---------------------------- */
-    std::string base = "./input";
-    for (int n = 1; n <= 10; n++)
+    if (choice != 0)
     {
-        // Computing the metadata for the n-sized dataset
-
-        Metadata sum{0, 0};
-        Metadata sumAgeOnly{0, 0};
-        Metadata sumNameOnly{0, 0};
-
-        for (int d = 1; d <= 10; d++)
+        for (int n = 10; n <= 100; n += 10)
         {
-            std::string dir =
-                base + "/" +
-                (d < 10 ? "00" : "0") + std::to_string(d);
+            Metadata sumMetadata{0, 0};
+            for (int i = 0; i < 10; i++)
+            {
+                std::string inputPath = "./input/n" + std::to_string(n) + "/sample" + std::to_string(i) + ".csv";
+                std::string outputPath = "./output/n" + std::to_string(n) + "/sample" + std::to_string(i) + ".csv";
 
-            std::string file =
-                dir + "/n" +
-                (n * 10 < 100 ? "0" : "") +
-                std::to_string(n * 10);
+                // Generate samples
+                auto &sampleOfSizeN = sampleN(dataset, n);
 
-            // Now, file is the path to a file of n-sized datapoints
-            auto &records = read(file);
-            auto recordsCopy = records;
-            auto recordsAnotherCopy = records;
+                // Write samples to input files
+                write(sampleOfSizeN, inputPath);
 
-            // Sort the vectors in memory
-            Metadata onAge = mergeSortWithMetadata(records, compareByAge);
-            Metadata onName = mergeSortWithMetadata(records, compareByName);
-            Metadata combined{onAge.comparisons + onName.comparisons, onAge.assignments + onAge.assignments};
+                // Sort the samples
+                auto currentMetadata = mergeSortWithMetadata(sampleOfSizeN, compareByTemperature);
+                write(sampleOfSizeN, outputPath);
 
-            Metadata onNameOnly = mergeSortWithMetadata(recordsCopy, compareByName);
-            Metadata onAgeOnly = mergeSortWithMetadata(recordsAnotherCopy, compareByAge);
+                sumMetadata.assignments += currentMetadata.assignments;
+                sumMetadata.comparisons += currentMetadata.comparisons;
+            }
 
-            // Write records to output folder
-            std::string outputPath = "./output/" + ((d < 10 ? "00" : "0") + std::to_string(d)) + "/n" + (n * 10 < 100 ? "0" : "") + std::to_string(n * 10);
+            // Compute average comparisons and assignments for this particular sample size
+            Metadata averageMetadata = sumMetadata;
+            averageMetadata.assignments = sumMetadata.assignments / 10;
+            averageMetadata.comparisons = sumMetadata.comparisons / 10;
 
-            write(records, outputPath);
-
-            // Update metrics for age only sorting
-            sumAgeOnly.comparisons += onAgeOnly.comparisons;
-            sumAgeOnly.assignments += onAgeOnly.assignments;
-
-            // Update metrics for name only sorting
-            sumNameOnly.comparisons += onNameOnly.comparisons;
-            sumNameOnly.assignments += onNameOnly.assignments;
-
-            // Update metrics for both columns
-            sum.comparisons += combined.comparisons;
-            sum.assignments += combined.assignments;
+            // Write the metadata to file
+            writeMetadata(averageMetadata, metadataPath);
         }
 
-        Metadata average = {sum.assignments / 10, sum.comparisons / 10};
-        report.push_back(average);
-
-        Metadata averageAgeOnly = {sumAgeOnly.assignments / 10, sumAgeOnly.comparisons / 10};
-        reportAgeOnly.push_back(averageAgeOnly);
-
-        Metadata averageNameOnly = {sumNameOnly.assignments / 10, sumNameOnly.comparisons / 10};
-        reportNameOnly.push_back(averageNameOnly);
+        std::cout << "Wrote the sorted contents to the ./output folder and the metadata (comparisons and assignments) to ./output/meta.csv" << std::endl;
+        return 0;
     }
-
-    /* --------------------- When sorted on both the fields --------------------- */
-
-    std::ofstream out("./output/report.txt");
-    if (!out)
-        return 1;
-
-    for (const Metadata &avg : report)
-        out << avg.comparisons << "," << avg.assignments << "\n";
-
-    /* ------------------------- When sorted on age only ------------------------ */
-
-    std::ofstream out2("./output/report_age_only.txt");
-    if (!out2)
-        return 1;
-
-    for (const Metadata &avg : reportAgeOnly)
-        out2 << avg.comparisons << "," << avg.assignments << "\n";
-
-    /* ------------------------ When sorted on name only ------------------------ */
-
-    std::ofstream out3("./output/report_name_only.txt");
-    if (!out3)
-        return 1;
-
-    for (const Metadata &avg : reportNameOnly)
-        out3 << avg.comparisons << "," << avg.assignments << "\n";
-
-    return 0;
 }
 
 /* -------------------------------------------------------------------------- */
-/*                            Comparator functions                            */
+/*                            Comparator function                             */
 /* -------------------------------------------------------------------------- */
 
-bool compareByAge(const Record *rec1, const Record *rec2)
+bool compareByTemperature(const Record *rec1, const Record *rec2)
 {
-    return rec1->age > rec2->age; // rec1 will come first in the sorted array
-}
-
-bool compareByName(const Record *rec1, const Record *rec2)
-{
-    return rec1->name < rec2->name;
+    // true means rec2 should come first, false means rec1 should come first
+    return !(rec1->averageTemp < rec2->averageTemp); // rec1 will come first in the sorted array if its temperature is lower
 }

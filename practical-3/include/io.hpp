@@ -14,12 +14,13 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
+#include <structs/Metadata.hpp>
 
 /**
  * @brief Read a text file's records, store them in the heap as an array of pointers (to other locations in the heap)
  *
  * @param relativePath Path to the file
- * @return Record** Pointer to the first element of the array of Record pointers
+ * @return std::vector<const Record *>& Reference to a vector of const Record pointers on the heap
  */
 std::vector<const Record *> &read(const std::string &relativePath);
 
@@ -31,6 +32,21 @@ std::vector<const Record *> &read(const std::string &relativePath);
  */
 void write(const std::vector<const Record *> &records, const std::string &relativePath);
 
-std::string convertRecordToString(const Record &);
+/**
+ * @brief Write metadata to a file in append mode
+ *
+ * @param meta The metadata struct to be written to file
+ * @param relativePath Relative path of the file
+ */
+void writeMetadata(Metadata meta, const std::string &relativePath);
+
+/**
+ * @brief Generate n random samples from the given vector of Record pointers
+ *
+ * @param records Vector of Record pointers on the heap
+ * @param n Number of samples to return
+ * @return std::vector<const Record *>& Sample of size n from the given records
+ */
+std::vector<const Record *> &sampleN(std::vector<const Record *> &records, int n);
 
 #endif
