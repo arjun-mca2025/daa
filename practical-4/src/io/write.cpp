@@ -9,6 +9,7 @@
 
 // Internal dependencies
 #include <structs/Record.hpp>
+#include <structs/Metadata.hpp>
 
 /* -------------------------------------------------------------------------- */
 /*                            Forward declarations                            */
@@ -41,6 +42,9 @@ void write(const std::vector<const Record *> &records, const std::string &relati
         return;
     }
 
+    // Write the header
+    file << "Data.Precipitation,Date.Full,Date.Month,Date.Week of,Date.Year,Station.City,Station.Code,Station.Location,Station.State,Data.Temperature.Avg Temp,Data.Temperature.Max Temp,Data.Temperature.Min Temp,Data.Wind.Direction,Data.Wind.Speed" << "\n";
+
     for (const Record *r : records)
     {
         file << _recordToLine(r) << "\n";
@@ -48,16 +52,21 @@ void write(const std::vector<const Record *> &records, const std::string &relati
 }
 
 /**
- * @brief Convert a record to a string representation
+ * @brief Write metadata to a file in append mode
  *
- * @param record Reference to the record
- * @return std::string String representation of the record
+ * @param meta The metadata struct to be written to file
+ * @param relativePath Relative path of the file
  */
-std::string convertRecordToString(const Record &record)
+void writeMetadata(Metadata meta, const std::string &relativePath)
 {
-    std::string tupleString = "";
-    tupleString += "(" + record.name + ", " + std::to_string(record.age) + ")";
-    return tupleString;
+    std::ofstream file(relativePath, std::ios::app);
+    if (!file.is_open())
+    {
+        std::cerr << "Cannot open file for writing: " << relativePath << std::endl;
+        return;
+    }
+
+    file << meta.comparisons << "," << meta.assignments << "\n";
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,5 +75,18 @@ std::string convertRecordToString(const Record &record)
 
 std::string _recordToLine(const Record *record)
 {
-    return record->name + "," + std::to_string(record->age);
+    return std::to_string(record->precipitation) + "," +
+           record->date + "," +
+           std::to_string(record->month) + "," +
+           std::to_string(record->week) + "," +
+           std::to_string(record->year) + "," +
+           record->city + "," +
+           record->code + "," +
+           "\"" + record->location + "\"" + "," +
+           record->state + "," +
+           std::to_string(record->averageTemp) + "," +
+           std::to_string(record->maxTemp) + "," +
+           std::to_string(record->minTemp) + "," +
+           std::to_string(record->windDirection) + "," +
+           std::to_string(record->windSpeed);
 }
