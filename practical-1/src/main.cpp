@@ -121,13 +121,13 @@ int main()
             sum.assignments += combined.assignments;
         }
 
-        Metadata average = {sum.assignments / 10, sum.comparisons / 10};
+        Metadata average = {sum.comparisons / 10, sum.assignments / 10};
         report.push_back(average);
 
-        Metadata averageAgeOnly = {sumAgeOnly.assignments / 10, sumAgeOnly.comparisons / 10};
+        Metadata averageAgeOnly = {sumAgeOnly.comparisons / 10, sumAgeOnly.assignments / 10};
         reportAgeOnly.push_back(averageAgeOnly);
 
-        Metadata averageNameOnly = {sumNameOnly.assignments / 10, sumNameOnly.comparisons / 10};
+        Metadata averageNameOnly = {sumNameOnly.comparisons / 10, sumNameOnly.assignments / 10};
         reportNameOnly.push_back(averageNameOnly);
     }
 
