@@ -8,12 +8,12 @@ files = [
 ]
 
 titles = [
-    "When sorted on age alone (Randomized Quick Sort)",
-    "When sorted on name alone (Randomized Quick Sort)",
-    "When sorted on age followed by name (Randomized Quick Sort)",
+    "When sorted on age alone (Radix Sort)",
+    "When sorted on name alone (Radix Sort)",
+    "When sorted on age followed by name (Radix Sort)",
 ]
 
-fig_names = ["age_only_random", "name_only_random", "both_random"]
+fig_names = ["age_only_radix", "name_only_radix", "both_radix"]
 
 for i, file_path in enumerate(files):
     # Lists to store numeric data
@@ -33,7 +33,7 @@ for i, file_path in enumerate(files):
     # Convert to numpy arrays
     y1 = np.array(col1)
     y2 = np.array(col2)
-    x = np.arange(len(y1))
+    x = np.arange(1, 1 + len(y1))
 
     degree = 1
 
@@ -54,9 +54,11 @@ for i, file_path in enumerate(files):
 
     plt.xlabel("n/10")
     plt.ylabel("Absolute number")
+    plt.xticks(np.arange(1, 10 + 1, 1))
+    plt.yticks(np.arange(1, 7000 + 1, 500))
     plt.title(titles[i])
     plt.legend()
-    plt.grid()
+    plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"./plots/{fig_names[i]}.png")
     plt.clf()

@@ -5,7 +5,7 @@ Plot the graphs of comparisons and assignments for both quick sort and randomize
 import numpy as np
 import matplotlib.pyplot as plt
 
-random_files = [
+radix_files = [
     "output/report_age_only.txt",
     "output/report_name_only.txt",
     "output/report.txt",
@@ -17,10 +17,22 @@ quick_files = [
     "../practical-4/output/report.txt",
 ]
 
+merge_files = [
+    "../practical-3/output/report_age_only.txt",
+    "../practical-3/output/report_name_only.txt",
+    "../practical-3/output/report.txt",
+]
+
+insertion_files = [
+    "../practical-1/output/report_age_only.txt",
+    "../practical-1/output/report_name_only.txt",
+    "../practical-1/output/report.txt",
+]
+
 titles = [
-    "When sorted on age alone (compared with Quick Sort)",
-    "When sorted on name alone (compared with Quick Sort)",
-    "When sorted on age followed by name (compared with Quick Sort)",
+    "When sorted on age alone (comparison)",
+    "When sorted on name alone (comparison)",
+    "When sorted on age followed by name (comparison)",
 ]
 
 fig_names = [
@@ -48,80 +60,103 @@ def read_csv(file_path, comparisons, assignments):
 def plot(
     figname,
     title,
+    comparisons_radix,
+    assignments_radix,
     comparisons_quick,
     assignments_quick,
-    comparisons_random,
-    assignments_random,
+    comparisons_merge,
+    assignments_merge,
+    comparisons_insertion,
+    assignments_insertion,
 ):
     """Plot a comparison plot"""
 
     # Convert to numpy arrays
+    y1_radix = np.array(comparisons_radix)
+    y2_radix = np.array(assignments_radix)
+
     y1_quick = np.array(comparisons_quick)
     y2_quick = np.array(assignments_quick)
 
-    y1_random = np.array(comparisons_random)
-    y2_random = np.array(assignments_random)
+    y1_merge = np.array(comparisons_merge)
+    y2_merge = np.array(assignments_merge)
 
-    x_quick = np.arange(len(y1_quick))
-    x_random = np.arange(len(y1_random))
+    y1_insertion = np.array(comparisons_insertion)
+    y2_insertion = np.array(assignments_insertion)
 
-    degree_quick = 1
-    degree_random = 1
-
-    # Fit polynomials
-    poly1_quick = np.poly1d(np.polyfit(x_quick, y1_quick, degree_quick))
-    poly2_quick = np.poly1d(np.polyfit(x_quick, y2_quick, degree_quick))
-    poly1_random = np.poly1d(np.polyfit(x_random, y1_random, degree_random))
-    poly2_random = np.poly1d(np.polyfit(x_random, y2_random, degree_random))
-
-    # Evaluate polynomials
-    fit1 = poly1_quick(x_quick)
-    fit2 = poly2_quick(x_quick)
-    fit3 = poly1_random(x_random)
-    fit4 = poly2_random(x_random)
+    x_radix = np.arange(1, 1 + len(y1_quick))
+    x_quick = np.arange(1, 1 + len(y1_quick))
+    x_merge = np.arange(1, 1 + len(y1_merge))
+    x_insertion = np.arange(1, 1 + len(y1_insertion))
 
     # Plot
-    plt.scatter(x_quick, y1_quick, label="Comparisons (Quick Sort)", color="blue")
-    plt.plot(x_quick, fit1, color="blue", linestyle="--")
-
-    plt.scatter(x_quick, y2_quick, label="Assignments (Quick Sort)", color="black")
-    plt.plot(x_quick, fit2, color="black", linestyle="--")
-
-    plt.scatter(
-        x_random,
-        y1_random,
-        label="Comparisons (Randomized Quick Sort)",
-        color="green",
+    plt.plot(
+        x_radix, y1_radix, label="Comparisons (Radix Sort)", color="red", marker="o"
     )
-    plt.plot(x_random, fit3, color="green", linestyle="--")
-
-    plt.scatter(x_random, y2_random, label="Assignments (Randomized Sort)", color="red")
-    plt.plot(x_random, fit4, color="red", linestyle="--")
+    plt.plot(
+        x_radix, y2_radix, label="Assignments (Radix Sort)", color="green", marker="s"
+    )
+    plt.plot(
+        x_quick, y1_quick, label="Comparisons (Quick Sort)", color="blue", marker="o"
+    )
+    plt.plot(
+        x_quick, y2_quick, label="Assignments (Quick Sort)", color="black", marker="s"
+    )
+    plt.plot(
+        x_merge, y1_merge, label="Comparisons (Merge Sort)", color="pink", marker="o"
+    )
+    plt.plot(
+        x_merge, y2_merge, label="Assignments (Merge Sort)", color="gray", marker="s"
+    )
+    plt.plot(
+        x_insertion,
+        y1_insertion,
+        label="Comparisons (Insertion Sort)",
+        color="cyan",
+        marker="o",
+    )
+    plt.plot(
+        x_insertion,
+        y2_insertion,
+        label="Assignments (Insertion Sort)",
+        color="magenta",
+        marker="s",
+    )
 
     plt.xlabel("n/10")
     plt.ylabel("Absolute number")
+    plt.xticks(np.arange(0, 10 + 1, 1))
+    plt.yticks(np.arange(0, 7000 + 1, 500))
     plt.title(title)
     plt.legend()
     plt.tight_layout()
+    plt.grid(True)
     plt.savefig(f"plots/{figname}.png")
-    plt.grid()
     plt.clf()
 
 
 if __name__ == "__main__":
-    for i in range(0, len(quick_files)):
-        random_path = random_files[i]
+    for i in range(0, len(radix_files)):
+        radix_path = radix_files[i]
         quick_path = quick_files[i]
+        merge_path = merge_files[i]
+        insertion_path = insertion_files[i]
 
         # Lists to store numeric data
-        comparisons_random = []
-        assignments_random = []
+        comparisons_radix = []
+        assignments_radix = []
         comparisons_quick = []
         assignments_quick = []
+        comparisons_merge = []
+        assignments_merge = []
+        comparisons_insertion = []
+        assignments_insertion = []
 
         # Read CSV
+        read_csv(radix_path, comparisons_radix, assignments_radix)
         read_csv(quick_path, comparisons_quick, assignments_quick)
-        read_csv(random_path, comparisons_random, assignments_random)
+        read_csv(merge_path, comparisons_merge, assignments_merge)
+        read_csv(insertion_path, comparisons_insertion, assignments_insertion)
 
         # Plot
         figname = fig_names[i]
@@ -129,8 +164,12 @@ if __name__ == "__main__":
         plot(
             figname,
             title,
+            comparisons_radix,
+            assignments_radix,
             comparisons_quick,
             assignments_quick,
-            comparisons_random,
-            assignments_random,
+            comparisons_merge,
+            assignments_merge,
+            comparisons_insertion,
+            assignments_insertion,
         )
