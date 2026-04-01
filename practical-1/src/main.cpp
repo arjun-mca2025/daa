@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <chrono>
 
 // Internal dependencies
 #include <structs/Record.hpp>
@@ -25,6 +26,8 @@ int main()
     std::vector<Metadata> report{}; // 10-sized vector for keeping average Metadata for each size of n
     std::vector<Metadata> reportAgeOnly{};
     std::vector<Metadata> reportNameOnly{};
+
+    std::vector<double> times;
 
     std::cout << "Enter 1 to run the program on example data or anything else to run it on the generated input: " << std::endl;
     int choice;
@@ -78,6 +81,7 @@ int main()
         Metadata sum{0, 0};
         Metadata sumAgeOnly{0, 0};
         Metadata sumNameOnly{0, 0};
+        double timeSum = 0;
 
         for (int d = 1; d <= 10; d++)
         {
@@ -96,9 +100,12 @@ int main()
             auto recordsAnotherCopy = records;
 
             // Sort the vectors in memory
+            auto start = std::chrono::steady_clock::now();
             Metadata onAge = insertionSortWithMetadata(records, compareByAge);
             Metadata onName = insertionSortWithMetadata(records, compareByName);
             Metadata combined{onAge.comparisons + onName.comparisons, onAge.assignments + onAge.assignments};
+            auto end = std::chrono::steady_clock::now();
+            timeSum += std::chrono::duration<double>(end - start).count();
 
             Metadata onNameOnly = insertionSortWithMetadata(recordsCopy, compareByName);
             Metadata onAgeOnly = insertionSortWithMetadata(recordsAnotherCopy, compareByAge);
@@ -121,6 +128,9 @@ int main()
             sum.assignments += combined.assignments;
         }
 
+        double averageTime = timeSum / 10;
+        times.push_back(averageTime);
+
         Metadata average = {sum.comparisons / 10, sum.assignments / 10};
         report.push_back(average);
 
@@ -130,6 +140,14 @@ int main()
         Metadata averageNameOnly = {sumNameOnly.comparisons / 10, sumNameOnly.assignments / 10};
         reportNameOnly.push_back(averageNameOnly);
     }
+
+    /* ----------------------------- Write the time ----------------------------- */
+    std::ofstream timestream("./output/time.txt");
+    if (!timestream)
+        return 1;
+
+    for (const double time : times)
+        timestream << time << "\n";
 
     /* --------------------- When sorted on both the fields --------------------- */
 

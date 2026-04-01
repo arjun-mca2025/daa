@@ -24,6 +24,7 @@ RECORDS_PER_FILE = 10
 #                               Utility functions                              #
 # ---------------------------------------------------------------------------- #
 
+
 def read_names(path):
     """Read the names list
 
@@ -46,22 +47,23 @@ def recreate_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.makedirs(path)
-    
+
 
 # ---------------------------------------------------------------------------- #
 #                                Main functions                                #
 # ---------------------------------------------------------------------------- #
 
+
 def copy_previous_input():
-    """Copy the Insertion sort input data
-    """
-    
-    recreate_dir(INPUT_DIR) # Clear the input directory
-    
+    """Copy the Insertion sort input data"""
+
+    recreate_dir(INPUT_DIR)  # Clear the input directory
+
     src = Path("../practical-1/input")
     dest = Path("./input")
 
     shutil.copytree(src, dest, dirs_exist_ok=True)
+
 
 def generate():
     """Generate random data
@@ -69,14 +71,13 @@ def generate():
     Raises:
         RuntimeError: If the names list supplied is empty
     """
-    
-    recreate_dir(INPUT_DIR) # Clear the input directory
-    
+
+    recreate_dir(INPUT_DIR)  # Clear the input directory
+
     names = read_names(NAMES_FILE)
 
     if not names:
         raise RuntimeError("names.txt is empty")
-
 
     for dir_index in range(1, NUM_DIRS + 1):
         subdir = os.path.join(INPUT_DIR, f"{dir_index:03}")
@@ -94,7 +95,7 @@ def generate():
 
 
 if __name__ == "__main__":
-        # ----------------------- Create the required structure ---------------------- #
+    # ----------------------- Create the required structure ---------------------- #
 
     input_folder = Path("input")
     output_folder = Path("output")
@@ -118,10 +119,16 @@ if __name__ == "__main__":
 
     for output_path in output_paths:
         output_path.mkdir(parents=True, exist_ok=True)
-    
-    print("Enter 0 for copying previous input data from insertion sort and 1 for generate new data: ")
+
+    open(
+        "./output/time.txt", "a"
+    ).close()  # create the time file if it does not exist already
+
+    print(
+        "Enter 0 for copying previous input data from insertion sort and 1 for generate new data: "
+    )
     choice = int(input())
-    
+
     if choice == 0:
         copy_previous_input()
     elif choice == 1:

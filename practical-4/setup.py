@@ -120,6 +120,10 @@ if __name__ == "__main__":
     for output_path in output_paths:
         output_path.mkdir(parents=True, exist_ok=True)
 
+    open(
+        "./output/time.txt", "a"
+    ).close()  # create the time file if it does not exist already
+
     print(
         "Enter 0 for copying previous input data from insertion sort and 1 for generate new data: "
     )
