@@ -8,6 +8,7 @@
 
 // Internal dependencies
 #include <data/Record.hpp>
+#include <graph/Edge.hpp>
 
 namespace graph
 {
@@ -28,6 +29,35 @@ namespace graph
     }
 
     template <typename RecordType>
+    std::vector<const Node<RecordType> *> Graph<RecordType>::getNodes() const
+    {
+        return this->nodes;
+    }
+
+    template <typename RecordType>
+    std::vector<const Edge<RecordType> *> Graph<RecordType>::getEdges() const
+    {
+        std::vector<const Edge<RecordType> *> edges;
+
+        for (int i = 0; i < this->adjacencyMatrix.size(); i++)
+        {
+            auto &src = this->nodes[i];
+            auto &row = this->adjacencyMatrix[i];
+
+            for (int j = 0; j < row.size(); j++)
+            {
+                auto &dest = this->nodes[j];
+                int weight = this->adjacencyMatrix[i][j];
+
+                Edge<RecordType> *edge = new Edge<RecordType>{src, dest, weight};
+                edges.push_back(edge);
+            }
+        }
+
+        return edges;
+    }
+
+    template <typename RecordType>
     const Node<RecordType> *Graph<RecordType>::getNode(int i) const
     {
         return this->nodes[i];
@@ -38,13 +68,19 @@ namespace graph
     {
         std::vector<const Node<RecordType> *> neighbours;
 
-        const std::vector<bool> &adjacencyRow = this->adjacencyMatrix[this->mapping.at(node)];
+        const std::vector<int> &adjacencyRow = this->adjacencyMatrix[this->mapping.at(node)];
 
         for (int i = 0; i < adjacencyRow.size(); i++)
             if (adjacencyRow[i])
                 neighbours.push_back(this->nodes[i]);
 
         return neighbours;
+    }
+
+    template <typename RecordType>
+    int Graph<RecordType>::getWeight(const Node<RecordType> *src, const Node<RecordType> *dest) const
+    {
+        return this->adjacencyMatrix[this->mapping.at(src)][this->mapping.at(dest)];
     }
 
     /* --------------------------------- Setters -------------------------------- */
@@ -60,13 +96,19 @@ namespace graph
         for (auto &vec : this->adjacencyMatrix)
             vec.push_back(false); /** @todo check why the type isn't being inferred here */
 
-        this->adjacencyMatrix.push_back(std::vector<bool>(numNodes, false)); // new row
+        this->adjacencyMatrix.push_back(std::vector<int>(numNodes, 0)); // new row
     }
 
     template <typename RecordType>
     void Graph<RecordType>::addEdge(const Node<RecordType> *src, const Node<RecordType> *dest)
     {
-        this->adjacencyMatrix[this->mapping[src]][this->mapping[dest]] = true;
+        this->adjacencyMatrix[this->mapping[src]][this->mapping[dest]] = 1;
+    }
+
+    template <typename RecordType>
+    void Graph<RecordType>::addEdge(const Node<RecordType> *src, const Node<RecordType> *dest, int weight)
+    {
+        this->adjacencyMatrix[this->mapping[src]][this->mapping[dest]] = weight;
     }
 
     /* ---------------------------- General functions --------------------------- */
@@ -83,7 +125,7 @@ namespace graph
 
             for (int j = 0; j < this->numNodes; j++)
             {
-                ss << this->adjacencyMatrix[i][j] ? 1 : 0;
+                ss << this->adjacencyMatrix[i][j];
                 if (j != this->numNodes - 1)
                     ss << " ";
             }
