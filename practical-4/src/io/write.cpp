@@ -6,6 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 
 // Internal dependencies
 #include <structs/Record.hpp>
@@ -55,9 +57,10 @@ void write(const std::vector<const Record *> &records, const std::string &relati
  */
 std::string convertRecordToString(const Record &record)
 {
+    std::ostringstream ss;
     std::string tupleString = "";
-    tupleString += "(" + record.name + ", " + std::to_string(record.age) + ")";
-    return tupleString;
+    ss << std::fixed << std::setprecision(1) << "(" << record.name << ", " << record.age << ")";
+    return ss.str();
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,5 +69,8 @@ std::string convertRecordToString(const Record &record)
 
 std::string _recordToLine(const Record *record)
 {
-    return record->name + "," + std::to_string(record->age);
+    std::ostringstream ss;
+    std::string tupleString = "";
+    ss << std::fixed << std::setprecision(1) << record->name << "," << record->age;
+    return ss.str();
 }

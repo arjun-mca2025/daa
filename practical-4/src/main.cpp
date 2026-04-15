@@ -15,6 +15,7 @@
 
 bool compareByAge(const Record *rec1, const Record *rec2);
 bool compareByName(const Record *rec1, const Record *rec2);
+bool compareByNameFollowedByAge(const Record *rec1, const Record *rec2);
 
 /* -------------------------------------------------------------------------- */
 /*                                  Main Body                                 */
@@ -108,9 +109,7 @@ int main()
             auto recordsAnotherCopy = records;
 
             // Sort the vectors in memory
-            Metadata onAge = quickSortWithMetadata(records, compareByAge);
-            Metadata onName = quickSortWithMetadata(records, compareByName);
-            Metadata combined{onAge.comparisons + onName.comparisons, onAge.assignments + onAge.assignments};
+            Metadata onNameFollowedByAge = quickSortWithMetadata(records, compareByNameFollowedByAge);
 
             Metadata onNameOnly = quickSortWithMetadata(recordsCopy, compareByName);
             Metadata onAgeOnly = quickSortWithMetadata(recordsAnotherCopy, compareByAge);
@@ -129,8 +128,8 @@ int main()
             sumNameOnly.assignments += onNameOnly.assignments;
 
             // Update metrics for both columns
-            sum.comparisons += combined.comparisons;
-            sum.assignments += combined.assignments;
+            sum.comparisons += onNameFollowedByAge.comparisons;
+            sum.assignments += onNameFollowedByAge.assignments;
         }
 
         Metadata average = {sum.comparisons / 10, sum.assignments / 10};
@@ -179,10 +178,21 @@ int main()
 
 bool compareByAge(const Record *rec1, const Record *rec2)
 {
-    return rec1->age > rec2->age; // rec1 will come first in the sorted array
+    return rec1->age < rec2->age; // rec1 will come first in the sorted array
 }
 
 bool compareByName(const Record *rec1, const Record *rec2)
 {
-    return rec1->name > rec2->name;
+    return rec1->name < rec2->name; // rec1 will come first in the sorted array
+}
+
+bool compareByNameFollowedByAge(const Record *rec1, const Record *rec2)
+{
+    /**
+     * Quick sort is not stable, so need to define this new comparator specific for quick sort only
+     */
+    if (rec1->name == rec2->name)
+        return rec1->age < rec2->age;
+    else
+        return rec1->name > rec2->name;
 }

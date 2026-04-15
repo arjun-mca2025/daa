@@ -1,11 +1,12 @@
 #ifndef QUICK_SORT_HPP
 #define QUICK_SORT_HPP
 
+// Internal dependencies
+#include <structs/Record.hpp>
+
+// External dependencies
 #include <vector>
 #include <functional>
-
-// Forward declaration
-struct Record;
 
 // Comparator type
 using Comparator = std::function<bool(const Record *, const Record *)>;

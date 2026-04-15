@@ -26,9 +26,6 @@ int _partition(std::vector<const Record *> &input,
                int &comparisons,
                int &assignments);
 
-bool compareByAge(const Record *rec1, const Record *rec2);
-bool compareByName(const Record *rec1, const Record *rec2);
-
 /* -------------------------------------------------------------------------- */
 /*                                  Main Body                                 */
 /* -------------------------------------------------------------------------- */
@@ -69,12 +66,12 @@ int _partition(std::vector<const Record *> &input,
 
     int i = left - 1;
 
-    for (int j = left; j < right; j++)
+    for (int j = left; j < right - 1; j++)
     {
         comparisons++;
 
         // If input[j] should come before pivot
-        if (comp(pivot, input[j]))
+        if (comp(input[j], pivot))
         {
             i++;
 
