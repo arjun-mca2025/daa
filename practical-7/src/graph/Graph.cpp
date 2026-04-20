@@ -103,12 +103,14 @@ namespace graph
     void Graph<RecordType>::addEdge(const Node<RecordType> *src, const Node<RecordType> *dest)
     {
         this->adjacencyMatrix[this->mapping[src]][this->mapping[dest]] = 1;
+        this->adjacencyMatrix[this->mapping[dest]][this->mapping[src]] = 1;
     }
 
     template <typename RecordType>
     void Graph<RecordType>::addEdge(const Node<RecordType> *src, const Node<RecordType> *dest, int weight)
     {
         this->adjacencyMatrix[this->mapping[src]][this->mapping[dest]] = weight;
+        this->adjacencyMatrix[this->mapping[dest]][this->mapping[src]] = weight;
     }
 
     /* ---------------------------- General functions --------------------------- */

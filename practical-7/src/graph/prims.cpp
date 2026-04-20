@@ -37,7 +37,7 @@ namespace graph
         std::vector<bool> inMST(n, false);
 
         // Start from node 0
-        key[0] = 0.0;
+        key[0] = 0;
 
         for (int count = 0; count < n - 1; ++count)
         {

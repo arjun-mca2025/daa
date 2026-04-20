@@ -48,7 +48,7 @@ namespace graph
         std::vector<int> parent(n, -1);
         std::vector<bool> visited(n, false);
 
-        dist[startIndex] = 0.0;
+        dist[startIndex] = 0;
 
         for (int count = 0; count < n; ++count)
         {
